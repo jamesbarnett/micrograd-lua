@@ -42,3 +42,13 @@ Value.mt.__pow = function(x, y)
 	return result
 end
 
+Value.mt.relu = function(x)
+  local result = Value:new(max(x.data, 0))
+
+  local function _backward()
+    x.grad = x.grad + result.data > 0 * result.grad
+  end
+
+  result._backward = _backward
+  return result
+end
