@@ -5,7 +5,6 @@ describe('Value', function()
 		local a = Value:new(2.0)
 		local b = Value:new(-4.0)
 		local c = a + b
-		assert.is_true(c.data == -2.0)
+		assert.equal(c.data, -2.0)
 	end)
 end)
-
