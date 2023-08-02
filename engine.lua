@@ -13,6 +13,12 @@ function Value:new(data, children, op)
 	return o
 end
 
+Value.mt.__tostring = function(self)
+	return string.format("Value(data=%f, grad=%f)", self.data, self.grad)
+end
+
+Value.__tostring = Value.mt.__tostring
+
 Value.mt.__add = function(self, other)
 	if type(self) == "number" then
 		self = Value:new(self)
@@ -37,7 +43,6 @@ Value.mt.__mul = function(self, other)
 	if type(self) == "number" then
 		self = Value:new(self)
 	end
-
   if type(other) == "number" then
     other = Value:new(other)
   end
@@ -96,8 +101,10 @@ Value.mt.__sub = function(self, other)
 	if type(self) == "number" then
 		self = Value:new(self)
 	end
-
-	return self.data + (-other)
+	if type(other) == "number" then
+		other = Value:new(other)
+	end
+	return self + (-other)
 end
 
 Value.__sub = Value.mt.__sub
