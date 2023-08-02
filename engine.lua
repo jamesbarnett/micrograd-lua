@@ -13,15 +13,18 @@ function Value:new(data, children, op)
 	return o
 end
 
-Value.mt.__add = function(x, y)
-  if type(y) == "number" then
-    y = Value:new(y)
+Value.mt.__add = function(self, other)
+	if type(self) == "number" then
+		self = Value:new(self)
+	end
+  if type(other) == "number" then
+    other = Value:new(other)
   end
 
-  local result = Value:new(x.data + y.data)
+  local result = Value:new(self.data + other.data)
 	local function _backward()
-		x.grad = x.grad + result.grad
-		y.grad = y.grad + result.grad
+		self.grad = self.grad + result.grad
+		other.grad = other.grad + result.grad
 	end
 
 	result._backward = _backward
@@ -30,14 +33,19 @@ end
 
 Value.__add = Value.mt.__add
 
-Value.mt.__mul = function(x, y)
-  if type(y) == "number" then
-    y = Value:new(y)
+Value.mt.__mul = function(self, other)
+	if type(self) == "number" then
+		self = Value:new(self)
+	end
+
+  if type(other) == "number" then
+    other = Value:new(other)
   end
-	local result = Value:new(x.data * y.data)
+
+	local result = Value:new(self.data * other.data)
 	local function _backward()
-		x.grad = x.grad * result.grad
-		y.grad = y.grad * result.grad
+		self.grad = self.grad * result.grad
+		other.grad = other.grad * result.grad
 	end
 
 	result._backward = _backward
@@ -59,12 +67,14 @@ end
 
 Value.__pow = Value.mt.__pow
 
-
-Value.mt.relu = function(x)
-  local result = Value:new(math.max(x.data, 0))
+Value.mt.relu = function(self)
+	if type(self) == "number" then
+		self = Value:new(self)
+	end
+  local result = Value:new(math.max(self.data, 0))
 
   local function _backward()
-    x.grad = x.grad + result.data > 0 * result.grad
+    self.grad = self.grad + result.data > 0 * result.grad
   end
 
   result._backward = _backward
@@ -74,10 +84,23 @@ end
 Value.relu = Value.mt.relu
 
 Value.mt.__unm = function(self)
+	if type(self) == "number" then
+		self = Value:new(self)
+	end
   return self * -1
 end
 
 Value.__unm = Value.mt.__unm
+
+Value.mt.__sub = function(self, other)
+	if type(self) == "number" then
+		self = Value:new(self)
+	end
+
+	return self.data + (-other)
+end
+
+Value.__sub = Value.mt.__sub
 
 -- Value.mt.backward = function(x)
 --   local topo = {}
